@@ -26,8 +26,17 @@ final Logger _log = genui.genUiLogger;
 /// the agent card, sending messages, and receiving the A2UI protocol stream.
 class A2uiAgentConnector {
   /// Creates a [A2uiAgentConnector] that connects to the given [url].
-  A2uiAgentConnector({required this.url, A2AClient? client, String? contextId})
-    : _contextId = contextId {
+  A2uiAgentConnector({
+    required this.url,
+    A2AClient? client,
+    String? contextId,
+    Map<String, String>? authHeaders,
+  }) : _contextId = contextId {
+    final mergedAuthHeaders = <String, String>{
+      'X-A2A-Extensions': a2uiExtensionUri.toString(),
+      ...?authHeaders,
+    };
+
     this.client =
         client ??
         A2AClient(
@@ -36,7 +45,7 @@ class A2uiAgentConnector {
           transport: SseTransport(
             url: url.toString(),
             log: _log,
-            authHeaders: {'X-A2A-Extensions': a2uiExtensionUri.toString()},
+            authHeaders: mergedAuthHeaders,
           ),
         );
   }
@@ -74,6 +83,7 @@ class A2uiAgentConnector {
   Future<String?> connectAndSend(
     genui.ChatMessage chatMessage, {
     genui.A2UiClientCapabilities? clientCapabilities,
+    Map<String, Object?>? metadata,
   }) async {
     final List<genui.MessagePart> parts = switch (chatMessage) {
       genui.UserMessage(parts: final p) => p,
@@ -123,16 +133,24 @@ class A2uiAgentConnector {
     );
 
     var messageToSend = message;
+
     if (taskId != null) {
       messageToSend = messageToSend.copyWith(referenceTaskIds: [taskId!]);
     }
+
     if (contextId != null) {
       messageToSend = messageToSend.copyWith(contextId: contextId);
     }
-    if (clientCapabilities != null) {
-      messageToSend = messageToSend.copyWith(
-        metadata: {'a2uiClientCapabilities': clientCapabilities.toJson()},
-      );
+
+    final Map<String, Object?> mergedMetadata = {
+      ...?messageToSend.metadata,
+      if (clientCapabilities != null)
+        'a2uiClientCapabilities': clientCapabilities.toJson(),
+      ...?metadata,
+    };
+
+    if (mergedMetadata.isNotEmpty) {
+      messageToSend = messageToSend.copyWith(metadata: mergedMetadata);
     }
 
     _log.info('--- OUTGOING REQUEST ---');

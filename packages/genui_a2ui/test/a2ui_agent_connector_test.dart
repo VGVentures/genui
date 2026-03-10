@@ -68,6 +68,47 @@ void main() {
       });
     });
 
+    test('connectAndSend includes custom metadata in message', () async {
+      fakeClient.messageStreamHandler = (_) => const Stream.empty();
+
+      await connector.connectAndSend(
+        genui.UserMessage.text('Hi'),
+        metadata: {'tenantId': 'tenant-1', 'locale': 'en-US'},
+      );
+
+      expect(fakeClient.messageStreamCalled, 1);
+      final a2a.Message sentMessage = fakeClient.lastMessageStreamParams!;
+      expect(sentMessage.metadata, isNotNull);
+      expect(sentMessage.metadata!['tenantId'], 'tenant-1');
+      expect(sentMessage.metadata!['locale'], 'en-US');
+    });
+
+    test(
+      'connectAndSend custom metadata overrides generated metadata',
+      () async {
+        const capabilities = genui.A2UiClientCapabilities(
+          supportedCatalogIds: ['cat1'],
+        );
+        fakeClient.messageStreamHandler = (_) => const Stream.empty();
+
+        await connector.connectAndSend(
+          genui.UserMessage.text('Hi'),
+          clientCapabilities: capabilities,
+          metadata: {
+            'a2uiClientCapabilities': {
+              'supportedCatalogIds': ['override'],
+            },
+          },
+        );
+
+        final a2a.Message sentMessage = fakeClient.lastMessageStreamParams!;
+        expect(sentMessage.metadata, isNotNull);
+        expect(sentMessage.metadata!['a2uiClientCapabilities'], {
+          'supportedCatalogIds': ['override'],
+        });
+      },
+    );
+
     test('connectAndSend processes stream and returns text response', () async {
       final responses = <a2a.Event>[
         const a2a.Event.taskStatusUpdate(

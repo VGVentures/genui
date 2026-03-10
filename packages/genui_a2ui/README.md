@@ -228,6 +228,32 @@ class _ChatScreenState extends State<ChatScreen> {
 -   **`A2uiAgentConnector`**: Handles the low-level WebSocket communication with the A2A server, including sending messages and parsing stream events.
 -   **`AgentCard`**: A data class holding metadata about the connected AI agent.
 
+## Authentication and Metadata
+
+You can pass a bearer token when creating the connector and include per-message
+metadata for each request:
+
+```dart
+final connector = A2uiAgentConnector(
+  url: Uri.parse('https://your-agent.example.com'),
+  authHeaders: {'Authorization': 'Bearer $accessToken'},
+);
+
+await connector.connectAndSend(
+  UserMessage.text('Show my dashboard'),
+  metadata: {
+    'tenantId': 'tenant-123',
+    'locale': 'en-US',
+  },
+);
+```
+
+Notes:
+- `authHeaders` are added to transport requests.
+- `metadata` is attached to the outgoing A2A `Message.metadata`.
+- If `clientCapabilities` and `metadata` both set the same key, `metadata`
+  wins.
+
 ## Example App
 
 See the `example/` directory for a more complete application demonstrating the usage of this package.
