@@ -137,6 +137,7 @@ class FakeA2uiAgentConnector implements A2uiAgentConnector {
 
   genui.ChatMessage? lastConnectAndSendChatMessage;
   genui.A2UiClientCapabilities? lastClientCapabilities;
+  Map<String, Object?>? lastMetadata;
 
   @override
   Future<String?> connectAndSend(
@@ -146,6 +147,7 @@ class FakeA2uiAgentConnector implements A2uiAgentConnector {
   }) async {
     lastConnectAndSendChatMessage = chatMessage;
     lastClientCapabilities = clientCapabilities;
+    lastMetadata = metadata;
     // Simulate sending a message and receiving a response
     return Future.value('Fake AI Response');
   }

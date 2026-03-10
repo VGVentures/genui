@@ -145,7 +145,10 @@ class GenUiConversation {
   }
 
   /// Sends a user message to the AI to generate a UI response.
-  Future<void> sendRequest(ChatMessage message) async {
+  Future<void> sendRequest(
+    ChatMessage message, {
+    Map<String, Object?>? metadata,
+  }) async {
     final List<ChatMessage> history = _conversation.value;
     if (message is! UserUiInteractionMessage) {
       _conversation.value = [...history, message];
@@ -161,6 +164,7 @@ class GenUiConversation {
       message,
       history: history,
       clientCapabilities: clientCapabilities,
+      metadata: metadata,
     );
   }
 

@@ -55,6 +55,7 @@ class A2uiContentGenerator implements ContentGenerator {
     ChatMessage message, {
     Iterable<ChatMessage>? history,
     A2UiClientCapabilities? clientCapabilities,
+    Map<String, Object?>? metadata,
   }) async {
     _isProcessing.value = true;
     try {
@@ -66,6 +67,7 @@ class A2uiContentGenerator implements ContentGenerator {
       final String? responseText = await connector.connectAndSend(
         message,
         clientCapabilities: clientCapabilities,
+        metadata: metadata,
       );
       if (responseText != null && responseText.isNotEmpty) {
         _textResponseController.add(responseText);

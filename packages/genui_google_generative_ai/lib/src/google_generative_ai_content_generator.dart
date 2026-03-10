@@ -111,6 +111,7 @@ class GoogleGenerativeAiContentGenerator implements ContentGenerator {
     ChatMessage message, {
     Iterable<ChatMessage>? history,
     A2UiClientCapabilities? clientCapabilities,
+    Map<String, Object?>? metadata,
   }) async {
     _isProcessing.value = true;
     try {

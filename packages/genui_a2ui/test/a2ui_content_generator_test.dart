@@ -77,6 +77,15 @@ void main() {
       expect(fakeConnector.lastClientCapabilities, capabilities);
     });
 
+    test('sendRequest passes metadata to connector', () async {
+      final userMessage = UserMessage([const TextPart('Test')]);
+      final metadata = <String, Object?>{'tenantId': 'tenant-123'};
+
+      await contentGenerator.sendRequest(userMessage, metadata: metadata);
+
+      expect(fakeConnector.lastMetadata, metadata);
+    });
+
     test('sendRequest adds response to textResponseStream', () async {
       final userMessage = UserMessage([const TextPart('Test')]);
       final completer = Completer<String>();

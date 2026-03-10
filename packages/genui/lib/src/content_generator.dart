@@ -51,6 +51,7 @@ abstract interface class ContentGenerator {
     ChatMessage message, {
     Iterable<ChatMessage>? history,
     A2UiClientCapabilities? clientCapabilities,
+    Map<String, Object?>? metadata,
   });
 
   /// Disposes of the resources used by this generator.
