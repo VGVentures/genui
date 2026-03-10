@@ -217,6 +217,19 @@ class A2AClient {
                     final_: false,
                   ),
                 );
+              } else if (data['kind'] == 'message') {
+                final message = Message.fromJson(data);
+                sink.add(
+                  Event.taskStatusUpdate(
+                    taskId: message.taskId ?? '',
+                    contextId: message.contextId ?? '',
+                    status: TaskStatus(
+                      state: TaskState.completed,
+                      message: message,
+                    ),
+                    final_: true,
+                  ),
+                );
               } else {
                 sink.add(Event.fromJson(data));
               }
